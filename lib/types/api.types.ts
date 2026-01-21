@@ -87,7 +87,8 @@ export interface IUser {
   email: string;
   roleId: string | IRole;
   isActive: boolean;
-  role?: RoleEnum;
+  role: RoleEnum;
+  userGroupId: IUserGroup;
   id: string;
   createdAt?: string;
   updatedAt?: string;
@@ -98,7 +99,8 @@ export interface ICreateUser {
   userName: string;
   email: string;
   password: string;
-  roleId: string;
+  // roleId?: string;
+  userGroupId: string;
 }
 
 export interface IUpdateUser {
@@ -106,7 +108,7 @@ export interface IUpdateUser {
   userName?: string;
   email?: string;
   password?: string;
-  roleId?: string;
+  // roleId?: string;
   isActive?: boolean;
 }
 
@@ -382,6 +384,39 @@ export interface IOvertimeDeductionSettings {
 
 export interface IWeekendSettings {
   weekendDays: string[];
+}
+
+// ============= User Group Types =============
+export interface IUserGroup {
+  _id: string;
+  name: string;
+  description?: string;
+  permissions: string[]; // Array of permission IDs
+  userIds: string[]; // Array of user IDs in this group
+  id: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ICreateUserGroup {
+  name: string;
+  description?: string;
+  permissions: string[];
+  userIds?: string[];
+}
+
+export interface IUpdateUserGroup {
+  name?: string;
+  description?: string;
+  permissions?: string[];
+  userIds?: string[];
+}
+
+// For validation rules in the UI
+export interface IUserGroupValidationRule {
+  id: number;
+  type: "System" | "Custom";
+  rule: string;
 }
 
 export interface IGeneralSettings

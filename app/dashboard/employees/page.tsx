@@ -401,7 +401,7 @@ export default function EmployeesPage() {
                 <TableCell>
                   {typeof employee.departmentId === "string"
                     ? employee.departmentId
-                    : employee.departmentId.name}
+                    : employee.departmentId?.name}
                 </TableCell>
                 <TableCell>${employee.baseSalary.toLocaleString()}</TableCell>
                 <TableCell>

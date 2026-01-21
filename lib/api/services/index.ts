@@ -9,3 +9,4 @@ export * from "./salary-report.service";
 export * from "./settings.service";
 export * from "./role-permission.service";
 export * from "./official-holiday.service";
+export * from "./userGroup.service";

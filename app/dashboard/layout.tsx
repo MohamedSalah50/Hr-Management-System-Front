@@ -28,6 +28,7 @@ const navigation = [
   { name: "Salary Reports", href: "/dashboard/salary-reports", icon: FileText },
   { name: "Users", href: "/dashboard/users", icon: UserCog },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "UserGroups", href: "/dashboard/user-group", icon: Users },
 ];
 
 export default function DashboardLayout({

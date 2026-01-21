@@ -7,3 +7,4 @@ export * from "./useEmployee";
 export * from "./useAttendance";
 export * from "./useSalaryReport";
 export * from "./useSettings";
+export * from "./useUserGroup";
