@@ -114,11 +114,6 @@ export default function UsersPage() {
       return;
     }
 
-    // if (!formData.roleId) {
-    //   toast.error("من فضلك اختر الصلاحية");
-    //   return;
-    // }
-
     if (!formData.userGroupId) {
       toast.error("من فضلك قم بتحديد المجموعة قبل الاضافة");
       return;
@@ -167,7 +162,6 @@ export default function UsersPage() {
       userName: user.userName,
       email: user.email,
       password: "",
-
       userGroupId:
         typeof user.userGroupId === "string"
           ? user.userGroupId
@@ -209,7 +203,6 @@ export default function UsersPage() {
   }
 
   const users = usersData?.data?.data || [];
-  const roles = rolesData?.data?.data || [];
   const userGroups = userGroupsData?.data?.data || [];
 
   return (
@@ -339,9 +332,6 @@ export default function UsersPage() {
                 </div>
               </div>
 
-              {/* Hidden Role field - set to admin by default */}
-              {/* <input type="hidden" value={formData.roleId} /> */}
-
               <div className="flex justify-end gap-2 pt-4">
                 <Button
                   type="button"
@@ -391,61 +381,69 @@ export default function UsersPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user._id}>
-                      <TableCell className="font-medium text-right">
-                        {user.fullName}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {user.userName}
-                      </TableCell>
-                      <TableCell className="text-right" dir="ltr">
-                        {user.email}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {typeof user.userGroupId === "object"
-                          ? user.userGroupId.name
-                          : "غير محدد"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Badge
-                          variant={user.isActive ? "default" : "secondary"}
-                        >
-                          {user.isActive ? "نشط" : "غير نشط"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <div className="flex justify-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleToggleStatus(user._id)}
-                            title={user.isActive ? "تعطيل" : "تفعيل"}
+                  {users.map((user) => {
+                    // ✅ استخراج اسم المجموعة بشكل آمن
+                    let groupName = "غير محدد";
+                    if (user.userGroupId) {
+                      if (typeof user.userGroupId === "object") {
+                        groupName = user.userGroupId.name || "غير محدد";
+                      }
+                    }
+
+                    return (
+                      <TableRow key={user._id}>
+                        <TableCell className="font-medium text-right">
+                          {user.fullName}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {user.userName}
+                        </TableCell>
+                        <TableCell className="text-right" dir="ltr">
+                          {user.email}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Badge variant="outline">{groupName}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Badge
+                            variant={user.isActive ? "default" : "secondary"}
                           >
-                            {user.isActive ? (
-                              <ToggleRight className="h-4 w-4" />
-                            ) : (
-                              <ToggleLeft className="h-4 w-4" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(user)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(user._id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-red-600" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                            {user.isActive ? "نشط" : "غير نشط"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex justify-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleToggleStatus(user._id)}
+                              title={user.isActive ? "تعطيل" : "تفعيل"}
+                            >
+                              {user.isActive ? (
+                                <ToggleRight className="h-4 w-4" />
+                              ) : (
+                                <ToggleLeft className="h-4 w-4" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(user)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDelete(user._id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>

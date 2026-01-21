@@ -85,13 +85,13 @@ export interface IUser {
   fullName: string;
   userName: string;
   email: string;
-  roleId: string | IRole;
+  userGroupId: string | IUserGroup; // ✅ المجموعة (يمكن string أو object)
   isActive: boolean;
-  role: RoleEnum;
-  userGroupId: IUserGroup;
   id: string;
   createdAt?: string;
   updatedAt?: string;
+  // Optional legacy fields
+  role?: RoleEnum;
 }
 
 export interface ICreateUser {
@@ -99,8 +99,7 @@ export interface ICreateUser {
   userName: string;
   email: string;
   password: string;
-  // roleId?: string;
-  userGroupId: string;
+  userGroupId: string; // ✅ المجموعة مطلوبة
 }
 
 export interface IUpdateUser {
@@ -108,9 +107,9 @@ export interface IUpdateUser {
   userName?: string;
   email?: string;
   password?: string;
-  // roleId?: string;
+  userGroupId?: string; // ✅ إضافة المجموعة للتحديث
   isActive?: boolean;
-}
+} 
 
 // ============= Permission Types =============
 export interface IPermission {
@@ -391,8 +390,8 @@ export interface IUserGroup {
   _id: string;
   name: string;
   description?: string;
-  permissions: string[]; // Array of permission IDs
-  userIds: string[]; // Array of user IDs in this group
+  permissions: string[];
+  userIds: string[];
   id: string;
   createdAt?: string;
   updatedAt?: string;
