@@ -14,6 +14,7 @@ import {
   Settings,
   UserCog,
   LogOut,
+  Calendar1,
 } from "lucide-react";
 import { useLogout } from "@/lib/hooks/useAuth";
 import { toast } from "sonner";
@@ -29,6 +30,7 @@ const navigation = [
   { name: "Users", href: "/dashboard/users", icon: UserCog },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
   { name: "UserGroups", href: "/dashboard/user-group", icon: Users },
+  { name: "Official Holidays", href: "/dashboard/official-holidays", icon: Calendar1 },
 ];
 
 export default function DashboardLayout({
