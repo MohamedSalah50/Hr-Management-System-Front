@@ -260,6 +260,8 @@ export interface ISearchAttendance {
   dateFrom?: string;
   dateTo?: string;
   employeeName?: string;
+  page?: number;
+  limit?: number;
 }
 
 export interface IAttendanceStatistics {
