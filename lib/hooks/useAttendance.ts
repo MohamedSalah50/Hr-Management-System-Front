@@ -58,19 +58,20 @@ export const useAttendanceStatistics = (
   });
 };
 
-// Create attendance
+// ✅ FIX: Create attendance with proper invalidation
 export const useCreateAttendance = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: ICreateAttendance) => attendanceService.create(data),
     onSuccess: () => {
+      // Invalidate immediately to refetch with populated data
       queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEYS.lists() });
     },
   });
 };
 
-// Update attendance
+// ✅ FIX: Update attendance with proper invalidation
 export const useUpdateAttendance = () => {
   const queryClient = useQueryClient();
 
@@ -78,6 +79,7 @@ export const useUpdateAttendance = () => {
     mutationFn: ({ id, data }: { id: string; data: IUpdateAttendance }) =>
       attendanceService.update(id, data),
     onSuccess: (_, variables) => {
+      // Invalidate both list and detail queries
       queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEYS.lists() });
       queryClient.invalidateQueries({
         queryKey: ATTENDANCE_KEYS.detail(variables.id),

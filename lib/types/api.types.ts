@@ -109,7 +109,7 @@ export interface IUpdateUser {
   password?: string;
   userGroupId?: string; // ✅ إضافة المجموعة للتحديث
   isActive?: boolean;
-} 
+}
 
 // ============= Permission Types =============
 export interface IPermission {
@@ -182,7 +182,7 @@ export interface IEmployee {
   baseSalary: number;
   checkInTime: string;
   checkOutTime: string;
-  departmentId: string | IDepartment;
+  departmentId: string;
   isActive: boolean;
   id: string;
   createdAt?: string;

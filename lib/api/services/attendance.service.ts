@@ -12,13 +12,19 @@ import {
 } from "@/lib/types/api.types";
 
 export const attendanceService = {
-  // Create attendance record
+  // ✅ FIX: Create attendance - Backend returns { message, data: [attendance] }
   create: async (data: ICreateAttendance) => {
-    const response = await apiClient.post<IResponse<IAttendance[]>>(
-      "/attendance",
-      data,
-    );
-    return response.data;
+    const response = await apiClient.post<{
+      message: string;
+      data: IAttendance[]; // Backend returns ARRAY
+    }>("/attendance", data);
+
+    // Transform to single object for consistency
+    return {
+      data: response.data.data[0], // Get first item from array
+      message: response.data.message,
+      status: 200,
+    } as IResponse<IAttendance>;
   },
 
   // Get all attendance records - Backend returns { data, total }
@@ -68,19 +74,29 @@ export const attendanceService = {
     } as IResponse<IAttendance>;
   },
 
-  // Update attendance record - Backend returns { message, data }
+  // ✅ FIX: Update attendance - Backend returns { message, data }
   update: async (id: string, data: IUpdateAttendance) => {
-    const response = await apiClient.patch<IResponse<IAttendance>>(
-      `/attendance/${id}`,
-      data,
-    );
-    return response.data;
+    const response = await apiClient.patch<{
+      message: string;
+      data: IAttendance;
+    }>(`/attendance/${id}`, data);
+
+    return {
+      data: response.data.data,
+      message: response.data.message,
+      status: 200,
+    } as IResponse<IAttendance>;
   },
 
   // Delete attendance record - Backend returns { message }
   delete: async (id: string) => {
-    const response = await apiClient.delete<IResponse>(`/attendance/${id}`);
-    return response.data;
+    const response = await apiClient.delete<{ message: string }>(
+      `/attendance/${id}`,
+    );
+    return {
+      message: response.data.message,
+      status: 200,
+    } as IResponse;
   },
 
   // Get statistics for employee - Backend returns { data }
