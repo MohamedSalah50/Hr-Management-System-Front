@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { salaryReportService } from "../api/services/salary-report.service";
-import { IGenerateReport, ISearchReport } from "../types/api.types";
+import { IGenerateReport, ISearchReport } from "../types";
 
 export const SALARY_REPORT_KEYS = {
   all: ["salary-reports"] as const,
@@ -16,7 +16,7 @@ export const SALARY_REPORT_KEYS = {
   print: (id: string) => [...SALARY_REPORT_KEYS.all, "print", id] as const,
 };
 
-// Get all salary reports
+// Get all reports
 export const useSalaryReports = () => {
   return useQuery({
     queryKey: SALARY_REPORT_KEYS.lists(),
@@ -24,7 +24,7 @@ export const useSalaryReports = () => {
   });
 };
 
-// Get salary report by ID
+// Get report by ID
 export const useSalaryReport = (id: string) => {
   return useQuery({
     queryKey: SALARY_REPORT_KEYS.detail(id),
@@ -33,7 +33,7 @@ export const useSalaryReport = (id: string) => {
   });
 };
 
-// Search salary reports
+// Search reports
 export const useSearchSalaryReports = (searchData: ISearchReport) => {
   return useQuery({
     queryKey: SALARY_REPORT_KEYS.list(searchData),
@@ -42,7 +42,7 @@ export const useSearchSalaryReports = (searchData: ISearchReport) => {
   });
 };
 
-// Get salary summary
+// Get summary
 export const useSalarySummary = (month: number, year: number) => {
   return useQuery({
     queryKey: SALARY_REPORT_KEYS.summary(month, year),
@@ -52,7 +52,7 @@ export const useSalarySummary = (month: number, year: number) => {
 };
 
 // Get report for print
-export const useSalaryReportForPrint = (id: string) => {
+export const useReportForPrint = (id: string) => {
   return useQuery({
     queryKey: SALARY_REPORT_KEYS.print(id),
     queryFn: () => salaryReportService.getForPrint(id),
@@ -61,7 +61,7 @@ export const useSalaryReportForPrint = (id: string) => {
 };
 
 // Generate report
-export const useGenerateSalaryReport = () => {
+export const useGenerateReport = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -73,7 +73,7 @@ export const useGenerateSalaryReport = () => {
 };
 
 // Generate all reports
-export const useGenerateAllSalaryReports = () => {
+export const useGenerateAllReports = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -85,27 +85,24 @@ export const useGenerateAllSalaryReports = () => {
   });
 };
 
-// Regenerate report
-export const useRegenerateSalaryReport = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: IGenerateReport) => salaryReportService.regenerate(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: SALARY_REPORT_KEYS.lists() });
-      queryClient.invalidateQueries({
-        queryKey: SALARY_REPORT_KEYS.summary(variables.month, variables.year),
-      });
-    },
-  });
-};
-
-// Delete salary report
-export const useDeleteSalaryReport = () => {
+// Delete report
+export const useDeleteReport = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => salaryReportService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SALARY_REPORT_KEYS.lists() });
+    },
+  });
+};
+
+// Regenerate report
+export const useRegenerateReport = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: IGenerateReport) => salaryReportService.regenerate(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SALARY_REPORT_KEYS.lists() });
     },

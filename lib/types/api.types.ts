@@ -301,7 +301,15 @@ export interface IUpdateOfficialHoliday {
 // ============= Salary Report Types =============
 export interface ISalaryReport {
   _id: string;
-  employeeId: string | IEmployee;
+  employeeId: {
+    _id: string;
+    fullName: string;
+    nationalId: string;
+    departmentId?: {
+      _id: string;
+      name: string;
+    };
+  };
   month: number;
   year: number;
   baseSalary: number;
@@ -312,7 +320,6 @@ export interface ISalaryReport {
   overtimeAmount: number;
   deductionAmount: number;
   netSalary: number;
-  id: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -359,6 +366,35 @@ export interface IReportForPrint {
   netSalary: number;
   generatedDate: string;
 }
+
+export const MONTHS_AR = [
+  "يناير",
+  "فبراير",
+  "مارس",
+  "أبريل",
+  "مايو",
+  "يونيو",
+  "يوليو",
+  "أغسطس",
+  "سبتمبر",
+  "أكتوبر",
+  "نوفمبر",
+  "ديسمبر",
+];
+
+export const formatCurrency = (amount: number): string => {
+  return (
+    new Intl.NumberFormat("ar-EG", {
+      style: "decimal",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount) + " جنيه"
+  );
+};
+
+export const getMonthName = (month: number): string => {
+  return MONTHS_AR[month - 1] || "";
+};
 
 // ============= Settings Types =============
 export interface ISetting {

@@ -9,22 +9,28 @@ import {
   ISearchReport,
   ISalarySummary,
   IReportForPrint,
-} from "@/lib/types/api.types";
+} from "@/lib/types";
 
 export const salaryReportService = {
-  // Generate report for single employee - Backend returns { message, data }
+  // Generate report for single employee
   generate: async (data: IGenerateReport) => {
-    const response = await apiClient.post<IResponse<ISalaryReport>>(
-      "/salary-reports/generate",
-      data,
-    );
-    return response.data;
+    const response = await apiClient.post<{
+      message: string;
+      data: ISalaryReport;
+    }>("/salary-reports/generate", data);
+
+    return {
+      data: response.data.data,
+      message: response.data.message,
+      status: 200,
+    } as IResponse<ISalaryReport>;
   },
 
   // Generate reports for all employees
   generateAll: async (month: number, year: number) => {
-    const response = await apiClient.post<
-      IResponse<{
+    const response = await apiClient.post<{
+      message: string;
+      data: {
         success: Array<{
           employeeId: string;
           employeeName: string;
@@ -35,21 +41,17 @@ export const salaryReportService = {
           employeeName: string;
           error: string;
         }>;
-      }>
-    >("/salary-reports/generate-all", { month, year });
-    return response.data;
+      };
+    }>("/salary-reports/generate-all", { month, year });
+
+    return {
+      data: response.data.data,
+      message: response.data.message,
+      status: 200,
+    } as IResponse<typeof response.data.data>;
   },
 
-  // Regenerate report (delete old & create new) - Backend returns { message, data }
-  regenerate: async (data: IGenerateReport) => {
-    const response = await apiClient.post<IResponse<ISalaryReport>>(
-      "/salary-reports/regenerate",
-      data,
-    );
-    return response.data;
-  },
-
-  // Get all reports - Backend returns { data, total }
+  // Get all reports
   getAll: async () => {
     const response = await apiClient.get<{
       data: ISalaryReport[];
@@ -66,7 +68,7 @@ export const salaryReportService = {
     } as IResponse<IPaginatedResponse<ISalaryReport>>;
   },
 
-  // Search reports - Backend returns { data, total }
+  // Search reports
   search: async (searchData: ISearchReport) => {
     const response = await apiClient.post<{
       data: ISalaryReport[];
@@ -83,7 +85,7 @@ export const salaryReportService = {
     } as IResponse<IPaginatedResponse<ISalaryReport>>;
   },
 
-  // Get report by ID - Backend returns { data }
+  // Get report by ID
   getById: async (id: string) => {
     const response = await apiClient.get<{ data: ISalaryReport }>(
       `/salary-reports/${id}`,
@@ -95,13 +97,7 @@ export const salaryReportService = {
     } as IResponse<ISalaryReport>;
   },
 
-  // Delete report - Backend returns { message }
-  delete: async (id: string) => {
-    const response = await apiClient.delete<IResponse>(`/salary-reports/${id}`);
-    return response.data;
-  },
-
-  // Get summary for period - Backend returns { data }
+  // Get summary
   getSummary: async (month: number, year: number) => {
     const response = await apiClient.get<{ data: ISalarySummary }>(
       `/salary-reports/summary?month=${month}&year=${year}`,
@@ -113,7 +109,7 @@ export const salaryReportService = {
     } as IResponse<ISalarySummary>;
   },
 
-  // Get report formatted for printing - Backend returns { data }
+  // Get report for print
   getForPrint: async (id: string) => {
     const response = await apiClient.get<{ data: IReportForPrint }>(
       `/salary-reports/${id}/print`,
@@ -123,5 +119,30 @@ export const salaryReportService = {
       message: "success",
       status: 200,
     } as IResponse<IReportForPrint>;
+  },
+
+  // Delete report
+  delete: async (id: string) => {
+    const response = await apiClient.delete<{ message: string }>(
+      `/salary-reports/${id}`,
+    );
+    return {
+      message: response.data.message,
+      status: 200,
+    } as IResponse;
+  },
+
+  // Regenerate report
+  regenerate: async (data: IGenerateReport) => {
+    const response = await apiClient.post<{
+      message: string;
+      data: ISalaryReport;
+    }>("/salary-reports/regenerate", data);
+
+    return {
+      data: response.data.data,
+      message: response.data.message,
+      status: 200,
+    } as IResponse<ISalaryReport>;
   },
 };
