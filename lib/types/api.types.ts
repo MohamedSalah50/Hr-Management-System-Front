@@ -266,9 +266,10 @@ export interface ISearchAttendance {
 
 export interface IAttendanceStatistics {
   totalDays: number;
-  presentDays: number;
-  absentDays: number;
-  holidays: number;
+  presentDays: number;      // حاضر
+  absentDays: number;       // غائب (سيُخصم)
+  holidays: number;         // إجازات رسمية (لن يُخصم)
+  sickLeave: number;        // إجازات مرضية (لن يُخصم)
   totalLateHours: number;
   totalOvertimeHours: number;
 }
@@ -315,6 +316,8 @@ export interface ISalaryReport {
   baseSalary: number;
   daysPresent: number;
   daysAbsent: number;
+  holidays: number;
+  sickLeave: number;
   overtimeHours: number;
   lateHours: number;
   overtimeAmount: number;
@@ -457,4 +460,4 @@ export interface IUserGroupValidationRule {
 }
 
 export interface IGeneralSettings
-  extends IOvertimeDeductionSettings, IWeekendSettings {}
+  extends IOvertimeDeductionSettings, IWeekendSettings { }
