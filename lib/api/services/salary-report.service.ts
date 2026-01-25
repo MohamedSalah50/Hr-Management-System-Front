@@ -111,9 +111,11 @@ export const salaryReportService = {
 
   // Get report for print
   getForPrint: async (id: string) => {
-    const response = await apiClient.get<{ data: IReportForPrint }>(
-      `/salary-reports/${id}/print`,
-    );
+    const url = `/salary-reports/${id}/print`;
+    console.log("PRINT URL 👉", url);
+
+    const response = await apiClient.get<{ data: IReportForPrint }>(url);
+
     return {
       data: response.data.data,
       message: "success",

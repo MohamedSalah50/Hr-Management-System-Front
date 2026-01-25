@@ -52,11 +52,20 @@ export const useSalarySummary = (month: number, year: number) => {
 };
 
 // Get report for print
+// export const useReportForPrint = (id: string) => {
+//   return useQuery({
+//     queryKey: SALARY_REPORT_KEYS.print(id),
+//     queryFn: () => salaryReportService.getForPrint(id),
+//     enabled: !!id,
+//   });
+// };
+
+// في useSalaryReport.ts
 export const useReportForPrint = (id: string) => {
   return useQuery({
     queryKey: SALARY_REPORT_KEYS.print(id),
     queryFn: () => salaryReportService.getForPrint(id),
-    enabled: !!id,
+    enabled: false, // مش هيشتغل لوحده، بس لما نعمل refetch
   });
 };
 

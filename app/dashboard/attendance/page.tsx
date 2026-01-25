@@ -65,6 +65,30 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
+const buildAttendanceSearchPayload = (
+  filters: ISearchAttendance,
+): Partial<ISearchAttendance> => {
+  const payload: Partial<ISearchAttendance> = {};
+
+  if (filters.employeeName?.trim()) {
+    payload.employeeName = filters.employeeName.trim();
+  }
+
+  if (filters.departmentId && filters.departmentId !== "all") {
+    payload.departmentId = filters.departmentId;
+  }
+
+  if (filters.dateFrom) {
+    payload.dateFrom = filters.dateFrom;
+  }
+
+  if (filters.dateTo) {
+    payload.dateTo = filters.dateTo;
+  }
+
+  return payload;
+};
+
 export default function AttendancePage() {
   const { data: attendanceData, isLoading, refetch } = useAttendanceRecords();
   const { data: employeesData } = useEmployees();
@@ -91,8 +115,11 @@ export default function AttendancePage() {
   });
 
   // Trigger search when filters change
+  const searchPayload = buildAttendanceSearchPayload(searchFilters);
+
   const { data: searchData, refetch: searchRefetch } =
-    useSearchAttendance(searchFilters);
+    useSearchAttendance(searchPayload);
+
   const [isSearchActive, setIsSearchActive] = useState(false);
 
   // Form state
@@ -203,12 +230,7 @@ export default function AttendancePage() {
 
   const handleSearch = () => {
     // Check if at least one filter is provided
-    if (
-      !searchFilters.employeeName &&
-      !searchFilters.departmentId &&
-      !searchFilters.dateFrom &&
-      !searchFilters.dateTo
-    ) {
+    if (Object.keys(searchPayload).length === 0) {
       toast.error("من فضلك أدخل معيار بحث واحد على الأقل");
       return;
     }
