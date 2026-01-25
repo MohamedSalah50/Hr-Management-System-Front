@@ -43,6 +43,7 @@ import {
   useDeleteReport,
   useSearchSalaryReports,
   useSalarySummary,
+  useReportForPrint,
 } from "@/lib/hooks/useSalaryReport";
 import { useEmployees } from "@/lib/hooks/useEmployee";
 import {
@@ -50,23 +51,36 @@ import {
   ISearchReport,
   MONTHS_AR,
   formatCurrency,
-  getMonthName,
 } from "@/lib/types";
-import {
-  Plus,
-  Search,
-  Trash2,
-  FileText,
-  Users,
-  // DollarSign,
-  // TrendingUp,
-  // TrendingDown,
-  X,
-} from "lucide-react";
+import { Plus, Search, Trash2, FileText, Users, Printer } from "lucide-react";
+
 import { useState } from "react";
 import { toast } from "sonner";
+import { salaryReportService } from "@/lib";
+
+const buildSalarySearchPayload = (
+  filters: ISearchReport,
+): Partial<ISearchReport> => {
+  const payload: Partial<ISearchReport> = {};
+
+  if (filters.employeeId && filters.employeeId !== "all") {
+    payload.employeeId = filters.employeeId;
+  }
+
+  if (filters.month && filters.month !== 0) {
+    payload.month = filters.month;
+  }
+
+  if (filters.year && filters.year !== 0) {
+    payload.year = filters.year;
+  }
+
+  return payload;
+};
 
 export default function SalaryReportPage() {
+  const [isPrinting, setIsPrinting] = useState(false);
+
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
   const currentYear = currentDate.getFullYear();
@@ -102,12 +116,16 @@ export default function SalaryReportPage() {
     year: 0,
   });
 
+  const searchPayload = buildSalarySearchPayload(searchFilters);
+
   const { data: searchData, refetch: searchRefetch } =
-    useSearchSalaryReports(searchFilters);
+    useSearchSalaryReports(searchPayload);
+
   const { data: summaryData } = useSalarySummary(
     searchFilters.month || currentMonth,
     searchFilters.year || currentYear,
   );
+
 
   const resetForm = () => {
     setFormData({
@@ -164,11 +182,7 @@ export default function SalaryReportPage() {
   };
 
   const handleSearch = () => {
-    if (
-      !searchFilters.employeeId &&
-      !searchFilters.month &&
-      !searchFilters.year
-    ) {
+    if (Object.keys(searchPayload).length === 0) {
       toast.error("من فضلك أدخل معيار بحث واحد على الأقل");
       return;
     }
@@ -556,8 +570,16 @@ export default function SalaryReportPage() {
               <TableHead className="text-center font-bold">الموظف</TableHead>
               <TableHead className="text-center font-bold">القسم</TableHead>
               <TableHead className="text-center font-bold">
-                الشهر/السنة
+                عدد أيام الحضور
               </TableHead>
+              <TableHead className="text-center font-bold">
+                عدد أيام الغياب
+              </TableHead>
+              <TableHead className="text-center font-bold">
+                الإضافي (س)
+              </TableHead>
+              <TableHead className="text-center font-bold">الخصم (س)</TableHead>
+
               <TableHead className="text-center font-bold">
                 الراتب الأساسي
               </TableHead>
@@ -566,7 +588,7 @@ export default function SalaryReportPage() {
               <TableHead className="text-center font-bold">
                 صافي الراتب
               </TableHead>
-              <TableHead className="text-center font-bold">إجراءات</TableHead>
+              <TableHead className="text-center font-bold">العمليات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -599,8 +621,33 @@ export default function SalaryReportPage() {
                       {deptData?.name || "-"}
                     </TableCell>
                     <TableCell className="text-center">
-                      {getMonthName(report.month)} {report.year}
+                      {report.daysPresent}
                     </TableCell>
+
+                    <TableCell className="text-center">
+                      {report.daysAbsent}
+                    </TableCell>
+
+                    <TableCell className="text-center">
+                      {report.overtimeHours > 0 ? (
+                        <span className="text-green-600 font-semibold">
+                          {report.overtimeHours.toFixed(2)}
+                        </span>
+                      ) : (
+                        "0.00"
+                      )}
+                    </TableCell>
+
+                    <TableCell className="text-center">
+                      {report.lateHours > 0 ? (
+                        <span className="text-red-600 font-semibold">
+                          {report.lateHours.toFixed(2)}
+                        </span>
+                      ) : (
+                        "0.00"
+                      )}
+                    </TableCell>
+
                     <TableCell className="text-center">
                       {formatCurrency(report.baseSalary)}
                     </TableCell>
@@ -620,6 +667,106 @@ export default function SalaryReportPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={async () => {
+                          try {
+                            setIsPrinting(true);
+                            console.log("🖨️ PRINT ID 👉", report._id);
+
+                            const response =
+                              await salaryReportService.getForPrint(report._id);
+
+                            console.log("📄 PRINT DATA 👉", response.data);
+
+                            if (!response.data) {
+                              toast.error("فشل في تحميل بيانات التقرير");
+                              return;
+                            }
+
+                            const printData = response.data;
+                            const printWindow = window.open("", "_blank");
+
+                            if (!printWindow) {
+                              toast.error("فشل في فتح نافذة الطباعة");
+                              return;
+                            }
+
+                            printWindow.document.write(`
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8">
+    <title>تقرير راتب - ${printData.employeeName}</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: 'Arial', sans-serif; padding: 40px; direction: rtl; }
+      .container { max-width: 800px; margin: 0 auto; border: 2px solid #333; padding: 30px; }
+      .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #333; padding-bottom: 20px; }
+      h1 { font-size: 28px; margin-bottom: 10px; color: #1a56db; }
+      table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+      th, td { border: 2px solid #333; padding: 12px; text-align: center; }
+      th { background: #1a56db; color: white; font-weight: bold; }
+      .total-row { background: #dbeafe; font-weight: bold; font-size: 18px; }
+      @media print { body { padding: 20px; } .container { border: none; } }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>تقرير راتب موظف</h1>
+        <p>الشهر: ${printData.month}/${printData.year}</p>
+        <p>تاريخ الطباعة: ${printData.generatedDate}</p>
+      </div>
+      
+      <table>
+        <tbody>
+          <tr><th>اسم الموظف</th><td>${printData.employeeName}</td></tr>
+          <tr><th>الرقم القومي</th><td>${printData.nationalId}</td></tr>
+          <tr><th>القسم</th><td>${printData.department}</td></tr>
+          <tr><th>الراتب الأساسي</th><td>${printData.baseSalary.toLocaleString("ar-EG")} جنيه</td></tr>
+          <tr><th>عدد أيام الحضور</th><td>${printData.daysPresent} يوم</td></tr>
+          <tr><th>عدد أيام الغياب</th><td>${printData.daysAbsent} يوم</td></tr>
+          <tr><th>ساعات العمل الإضافي</th><td>${printData.overtimeHours.toFixed(2)} ساعة</td></tr>
+          <tr><th>ساعات التأخير</th><td>${printData.lateHours.toFixed(2)} ساعة</td></tr>
+          <tr style="background: #dcfce7;">
+            <th>إجمالي الإضافات</th>
+            <td style="color: #16a34a; font-weight: bold;">+ ${printData.overtimeAmount.toLocaleString("ar-EG")} جنيه</td>
+          </tr>
+          <tr style="background: #fee2e2;">
+            <th>إجمالي الخصومات</th>
+            <td style="color: #dc2626; font-weight: bold;">- ${printData.deductionAmount.toLocaleString("ar-EG")} جنيه</td>
+          </tr>
+          <tr class="total-row">
+            <th>صافي الراتب</th>
+            <td style="color: #1a56db;">${printData.netSalary.toLocaleString("ar-EG")} جنيه</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
+      `);
+
+                            printWindow.document.close();
+                            setTimeout(() => {
+                              printWindow.print();
+                              setIsPrinting(false);
+                            }, 500);
+
+                            toast.success("تم تحضير التقرير للطباعة");
+                          } catch (error) {
+                            console.error("❌ PRINT ERROR:", error);
+                            toast.error("فشل في طباعة التقرير");
+                            setIsPrinting(false);
+                          }
+                        }}
+                        disabled={isPrinting}
+                        className="h-8 w-8 hover:bg-blue-50"
+                      >
+                        <Printer className="h-4 w-4 text-blue-600" />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"

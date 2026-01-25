@@ -62,6 +62,7 @@ export default function DepartmentsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.name) return toast.error("Please enter a name");
     if (editingDepartment) {
       updateDepartment(
         { id: editingDepartment._id, data: formData },
@@ -71,7 +72,10 @@ export default function DepartmentsPage() {
             setIsDialogOpen(false);
             resetForm();
           },
-          onError: () => toast.error("Failed to update department"),
+          onError: (error: any) =>
+            toast.error(
+              error?.response?.data?.message || "Failed to update department",
+            ),
         },
       );
     } else {
@@ -81,7 +85,10 @@ export default function DepartmentsPage() {
           setIsDialogOpen(false);
           resetForm();
         },
-        onError: () => toast.error("Failed to create department"),
+        onError: (error: any) =>
+          toast.error(
+            error?.response?.data?.message || "Failed to create department",
+          ),
       });
     }
   };
@@ -150,7 +157,7 @@ export default function DepartmentsPage() {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder="e.g., Human Resources"
-                  required
+                  // required
                 />
               </div>
               <div className="space-y-2">

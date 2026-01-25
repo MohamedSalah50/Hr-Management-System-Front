@@ -62,7 +62,7 @@ import { toast } from "sonner";
 export default function UsersPage() {
   const { data: usersData, isLoading } = useUsers();
   const { data: rolesData } = useRoles();
-  const { data: userGroupsData } = useUserGroups(); // ✅ جلب المجموعات
+  const { data: userGroupsData } = useUserGroups(); 
   const { mutate: createUser } = useCreateUser();
   const { mutate: updateUser } = useUpdateUser();
   const { mutate: deleteUser } = useDeleteUser();
@@ -76,7 +76,7 @@ export default function UsersPage() {
     userName: "",
     email: "",
     password: "",
-    userGroupId: "", // ✅ إضافة المجموعة
+    userGroupId: "", 
   });
 
   const resetForm = () => {
@@ -246,7 +246,7 @@ export default function UsersPage() {
                     }
                     placeholder="الاسم بالكامل"
                     className="text-right"
-                    required
+                    // required
                   />
                 </div>
 
@@ -263,7 +263,7 @@ export default function UsersPage() {
                     }
                     placeholder="اسم المستخدم"
                     className="text-right"
-                    required
+                    // required
                   />
                 </div>
 
@@ -282,7 +282,7 @@ export default function UsersPage() {
                     placeholder="Example@gmail.com"
                     className="text-right"
                     dir="ltr"
-                    required
+                    // required
                   />
                 </div>
               </div>
@@ -303,7 +303,7 @@ export default function UsersPage() {
                     }
                     placeholder="الباسورد"
                     className="text-right"
-                    required={!editingUser}
+                    // required={!editingUser}
                   />
                 </div>
 

@@ -31,14 +31,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import {
-  Users,
-  Plus,
-  Pencil,
-  Trash2,
-  UserPlus,
-  Shield,
-} from "lucide-react";
+import { Users, Plus, Pencil, Trash2, UserPlus, Shield } from "lucide-react";
 import {
   useUserGroups,
   useCreateUserGroup,
@@ -79,12 +72,12 @@ export default function UserGroupsPage() {
 
   const handleCreate = () => {
     if (!formData.name.trim()) {
-      toast.error("اسم المجموعة مطلوب");
+      toast.error("من فضلك ادخل اسم المجموعه");
       return;
     }
 
     if (formData.permissions.length === 0) {
-      toast.error("يجب تحديد الصلاحيات");
+      toast.error("من فضلك قم بتحديد  صلاحيات المجموعه قبل الاضافه");
       return;
     }
 
