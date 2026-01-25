@@ -1,4 +1,3 @@
-// app/login/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -16,7 +15,6 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 
-// Define an interface that extends the base Error type
 interface ApiError extends Error {
   response?: {
     data?: {
@@ -28,6 +26,7 @@ interface ApiError extends Error {
 export default function LoginPage() {
   const router = useRouter();
   const { mutate: login, isPending } = useLogin();
+
   const [formData, setFormData] = useState({
     usernameOrEmail: "",
     password: "",
@@ -35,47 +34,73 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // =====================
+    // Client-side validation (toast only)
+    // =====================
+    if (!formData.usernameOrEmail.trim()) {
+      toast.error("من فضلك أدخل اسم المستخدم أو البريد الإلكتروني");
+      return;
+    }
+
+    if (!formData.password.trim()) {
+      toast.error("من فضلك أدخل كلمة المرور");
+      return;
+    }
+
+    // =====================
+    // API Call
+    // =====================
     login(formData, {
       onSuccess: () => {
-        toast.success("Login successful!");
+        toast.success("تم تسجيل الدخول بنجاح");
         router.push("/dashboard");
       },
-      // Accept the Error type from the library, then safely cast
       onError: (error: Error) => {
         const apiError = error as ApiError;
         toast.error(
           apiError.response?.data?.message ||
             apiError.message ||
-            "Login failed",
+            "بيانات الدخول غير صحيحة",
         );
       },
     });
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Welcome Back</CardTitle>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center space-y-1">
+          <CardTitle className="text-2xl font-bold">
+            Welcome Back
+          </CardTitle>
           <CardDescription>
             Sign in to your HR management account
           </CardDescription>
         </CardHeader>
+
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Username / Email */}
             <div className="space-y-2">
-              <Label htmlFor="usernameOrEmail">Username or Email</Label>
+              <Label htmlFor="usernameOrEmail">
+                Username or Email
+              </Label>
               <Input
                 id="usernameOrEmail"
                 type="text"
                 placeholder="Enter username or email"
                 value={formData.usernameOrEmail}
                 onChange={(e) =>
-                  setFormData({ ...formData, usernameOrEmail: e.target.value })
+                  setFormData({
+                    ...formData,
+                    usernameOrEmail: e.target.value,
+                  })
                 }
-                required
               />
             </div>
+
+            {/* Password */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -84,12 +109,19 @@ export default function LoginPage() {
                 placeholder="Enter password"
                 value={formData.password}
                 onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
+                  setFormData({
+                    ...formData,
+                    password: e.target.value,
+                  })
                 }
-                required
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isPending}>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isPending}
+            >
               {isPending ? "Signing in..." : "Sign In"}
             </Button>
           </form>

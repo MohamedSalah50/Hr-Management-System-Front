@@ -98,6 +98,80 @@ export default function EmployeesPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    //validation rules
+    if (!formData.fullName.trim()) {
+      toast.error("من فضلك ادخل الاسم بالكامل");
+      return;
+    }
+
+    if (!formData.nationalId.trim()) {
+      toast.error("من فضلك ادخل الرقم القومي");
+      return;
+    }
+
+    if (!/^\d{14}$/.test(formData.nationalId)) {
+      toast.error("الرقم القومي يجب أن يكون 14 رقم");
+      return;
+    }
+
+    if (!formData.phone.trim()) {
+      toast.error("من فضلك ادخل رقم الهاتف");
+      return;
+    }
+
+    if (!/^\d{11}$/.test(formData.phone)) {
+      toast.error("رقم الهاتف يجب أن يكون 11 رقم");
+      return;
+    }
+
+    if (!formData.address.trim()) {
+      toast.error("من فضلك ادخل العنوان");
+      return;
+    }
+
+    if (!formData.birthDate) {
+      toast.error("من فضلك اختر تاريخ الميلاد");
+      return;
+    }
+
+    // مثال: تاريخ الميلاد لا يمكن أن يكون بعد 6/6/2005 (لمن هم أقل من 18 سنة)
+    const birth = new Date(formData.birthDate);
+    const minBirth = new Date("2005-06-06");
+    if (birth > minBirth) {
+      toast.error("تاريخ الميلاد يجب أن يكون قبل 6/6/2005");
+      return;
+    }
+
+    if (!formData.nationality.trim()) {
+      toast.error("من فضلك ادخل الجنسية");
+      return;
+    }
+
+    if (!formData.contractDate) {
+      toast.error("من فضلك اختر تاريخ التعاقد");
+      return;
+    }
+
+    if (!formData.baseSalary || formData.baseSalary <= 0) {
+      toast.error("من فضلك ادخل الراتب الأساسي بشكل صحيح");
+      return;
+    }
+
+    if (!formData.checkInTime) {
+      toast.error("من فضلك اختر وقت الحضور");
+      return;
+    }
+
+    if (!formData.checkOutTime) {
+      toast.error("من فضلك اختر وقت الانصراف");
+      return;
+    }
+
+    if (!formData.departmentId) {
+      toast.error("من فضلك اختر القسم");
+      return;
+    }
+
     if (editingEmployee) {
       updateEmployee(
         { id: editingEmployee._id, data: formData },
@@ -107,7 +181,10 @@ export default function EmployeesPage() {
             setIsDialogOpen(false);
             resetForm();
           },
-          onError: () => toast.error("Failed to update employee"),
+          onError: (error: any) =>
+            toast.error(
+              error?.response?.data?.message || "Failed to update employee",
+            ),
         },
       );
     } else {
@@ -117,7 +194,10 @@ export default function EmployeesPage() {
           setIsDialogOpen(false);
           resetForm();
         },
-        onError: () => toast.error("Failed to create employee"),
+        onError: (error: any) =>
+          toast.error(
+            error?.response?.data?.message || "Failed to create employee",
+          ),
       });
     }
   };
@@ -199,40 +279,87 @@ export default function EmployeesPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="fullName">اسم الموظف</Label>
                   <Input
                     id="fullName"
                     value={formData?.fullName}
                     onChange={(e) =>
                       setFormData({ ...formData, fullName: e.target.value })
                     }
-                    required
+                    // required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="nationalId">National ID</Label>
+                  <Label htmlFor="contractDate">تاريخ التعاقد</Label>
                   <Input
-                    id="nationalId"
-                    value={formData.nationalId}
+                    id="contractDate"
+                    type="date"
+                    value={formData.contractDate}
                     onChange={(e) =>
-                      setFormData({ ...formData, nationalId: e.target.value })
+                      setFormData({
+                        ...formData,
+                        contractDate: e.target.value,
+                      })
                     }
-                    required
+                    // required
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) =>
+                      setFormData({ ...formData, address: e.target.value })
+                    }
+                    // required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="baseSalary">الراتب</Label>
+                  <Input
+                    id="baseSalary"
+                    type="number"
+                    value={formData.baseSalary}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        baseSalary: parseFloat(e.target.value),
+                      })
+                    }
+                    // required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone">رقم التليفون</Label>
                   <Input
                     id="phone"
                     value={formData.phone}
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
                     }
-                    required
+                    // required
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="gender">Gender</Label>
+                  <Label htmlFor="checkInTime">موعد الحضور</Label>
+                  <Input
+                    id="checkInTime"
+                    type="time"
+                    value={formData.checkInTime}
+                    onChange={(e) =>
+                      setFormData({ ...formData, checkInTime: e.target.value })
+                    }
+                    // required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="gender">النوع</Label>
                   <Select
                     value={formData.gender}
                     onValueChange={(value) =>
@@ -248,73 +375,9 @@ export default function EmployeesPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="birthDate">Birth Date</Label>
-                  <Input
-                    id="birthDate"
-                    type="date"
-                    value={formData.birthDate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, birthDate: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="nationality">Nationality</Label>
-                  <Input
-                    id="nationality"
-                    value={formData.nationality}
-                    onChange={(e) =>
-                      setFormData({ ...formData, nationality: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="contractDate">Contract Date</Label>
-                  <Input
-                    id="contractDate"
-                    type="date"
-                    value={formData.contractDate}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        contractDate: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="baseSalary">Base Salary</Label>
-                  <Input
-                    id="baseSalary"
-                    type="number"
-                    value={formData.baseSalary}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        baseSalary: parseFloat(e.target.value),
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="checkInTime">Check-in Time</Label>
-                  <Input
-                    id="checkInTime"
-                    type="time"
-                    value={formData.checkInTime}
-                    onChange={(e) =>
-                      setFormData({ ...formData, checkInTime: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="checkOutTime">Check-out Time</Label>
+                  <Label htmlFor="checkOutTime">موعد الانصراف</Label>
                   <Input
                     id="checkOutTime"
                     type="time"
@@ -322,11 +385,49 @@ export default function EmployeesPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, checkOutTime: e.target.value })
                     }
-                    required
+                    // required
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="departmentId">Department</Label>
+                  <Label htmlFor="nationality">الجنسيه</Label>
+                  <Input
+                    id="nationality"
+                    value={formData.nationality}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nationality: e.target.value })
+                    }
+                    // required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="birthDate">تاريخ الميلاد</Label>
+                  <Input
+                    id="birthDate"
+                    type="date"
+                    value={formData.birthDate}
+                    onChange={(e) =>
+                      setFormData({ ...formData, birthDate: e.target.value })
+                    }
+                    // required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="nationalId">الرقم القومي</Label>
+                  <Input
+                    id="nationalId"
+                    value={formData.nationalId}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nationalId: e.target.value })
+                    }
+                    // required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="departmentId">القسم</Label>
                   <Select
                     value={formData.departmentId}
                     onValueChange={(value) =>
@@ -344,17 +445,6 @@ export default function EmployeesPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) =>
-                      setFormData({ ...formData, address: e.target.value })
-                    }
-                    required
-                  />
                 </div>
               </div>
               <div className="flex justify-end gap-2">
@@ -387,7 +477,7 @@ export default function EmployeesPage() {
               <TableHead>Department</TableHead>
               <TableHead>Salary</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -401,7 +491,7 @@ export default function EmployeesPage() {
                 <TableCell>
                   {typeof employee.departmentId === "string"
                     ? employee.departmentId
-                    : employee.departmentId?.name}
+                    : employee.departmentId.name}
                 </TableCell>
                 <TableCell>${employee.baseSalary.toLocaleString()}</TableCell>
                 <TableCell>

@@ -599,8 +599,8 @@ export default function AttendancePage() {
               <TableHead className="text-center font-bold">
                 وقت الانصراف
               </TableHead>
-              <TableHead className="text-center font-bold">تأخير (س)</TableHead>
-              <TableHead className="text-center font-bold">إضافي (س)</TableHead>
+              {/* <TableHead className="text-center font-bold">تأخير (س)</TableHead>
+              <TableHead className="text-center font-bold">إضافي (س)</TableHead> */}
               <TableHead className="text-center font-bold">التاريخ</TableHead>
               <TableHead className="text-center font-bold">العمليات</TableHead>
             </TableRow>
@@ -627,7 +627,7 @@ export default function AttendancePage() {
                   <TableCell className="text-center">{index + 1}</TableCell>
                   <TableCell className="text-center">
                     {typeof attendance.employeeId === "object" &&
-                    typeof attendance.employeeId.departmentId === "object"
+                    typeof attendance.employeeId?.departmentId === "object"
                       ? attendance.employeeId?.departmentId?.name
                       : "-"}
                   </TableCell>
@@ -642,7 +642,7 @@ export default function AttendancePage() {
                   <TableCell className="text-center">
                     {attendance.checkOut || "-"}
                   </TableCell>
-                  <TableCell className="text-center">
+                  {/* <TableCell className="text-center">
                     {attendance.lateHours > 0 ? (
                       <span className="text-red-600 font-semibold">
                         {attendance.lateHours.toFixed(2)}
@@ -659,7 +659,7 @@ export default function AttendancePage() {
                     ) : (
                       <span className="text-gray-400">0.00</span>
                     )}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell className="text-center text-sm">
                     {new Date(attendance.date).toLocaleDateString("ar-EG", {
                       weekday: "long",
