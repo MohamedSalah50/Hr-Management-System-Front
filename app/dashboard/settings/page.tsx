@@ -9,15 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,18 +31,17 @@ import {
   useWeekendSettings,
 } from "@/lib/hooks/useSettings";
 import { IOvertimeDeductionSettings, IWeekendSettings } from "@/lib/types";
-import { Save, Settings as SettingsIcon } from "lucide-react";
+import { Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-// ✅ حسب الـ SRS: فقط الجمعة والسبت
 const weekDays = [
   { name: "Monday", nameAr: "الإثنين", disabled: true },
   { name: "Tuesday", nameAr: "الثلاثاء", disabled: true },
   { name: "Wednesday", nameAr: "الأربعاء", disabled: true },
   { name: "Thursday", nameAr: "الخميس", disabled: true },
-  { name: "Friday", nameAr: "الجمعة", disabled: false }, // ✅ متاح
-  { name: "Saturday", nameAr: "السبت", disabled: false }, // ✅ متاح
+  { name: "Friday", nameAr: "الجمعة", disabled: false },
+  { name: "Saturday", nameAr: "السبت", disabled: false },
   { name: "Sunday", nameAr: "الأحد", disabled: true },
 ];
 
@@ -67,8 +58,9 @@ export default function SettingsPage() {
 
   const [overtimeSettings, setOvertimeSettings] =
     useState<IOvertimeDeductionSettings>({
-      overtimeRatePerHour: 0,
-      deductionRatePerHour: 0,
+      overtimeHoursMultiplier: 1.5,
+      deductionHoursMultiplier: 2,
+      workingHoursPerDay: 8,
     });
 
   const [weekendSettings, setWeekendSettings] = useState<IWeekendSettings>({
@@ -79,8 +71,11 @@ export default function SettingsPage() {
   useEffect(() => {
     if (overtimeData?.data) {
       setOvertimeSettings({
-        overtimeRatePerHour: overtimeData.data.overtimeRatePerHour || 0,
-        deductionRatePerHour: overtimeData.data.deductionRatePerHour || 0,
+        overtimeHoursMultiplier:
+          overtimeData.data.overtimeHoursMultiplier ?? 1.5,
+        deductionHoursMultiplier:
+          overtimeData.data.deductionHoursMultiplier ?? 2,
+        workingHoursPerDay: overtimeData.data.workingHoursPerDay ?? 8,
       });
     }
   }, [overtimeData]);
@@ -96,19 +91,22 @@ export default function SettingsPage() {
   // Validation Rule #3: Pop up for confirmation
   const handleSaveOvertimeClick = () => {
     // Validation Rule #2: Check if fields are empty
-    if (
-      overtimeSettings.overtimeRatePerHour === undefined ||
-      overtimeSettings.overtimeRatePerHour === null ||
-      overtimeSettings.deductionRatePerHour === undefined ||
-      overtimeSettings.deductionRatePerHour === null
-    ) {
-      toast.error("من فضلك ادخال بيانات الحقل");
-      return;
-    }
+    // if (
+    //   overtimeSettings.deductionHoursMultiplier === undefined ||
+    //   overtimeSettings.deductionHoursMultiplier === null ||
+    //   overtimeSettings.overtimeHoursMultiplier === undefined ||
+    //   overtimeSettings.overtimeHoursMultiplier === null ||
+    //   overtimeSettings.workingHoursPerDay === undefined ||
+    //   overtimeSettings.workingHoursPerDay === null
+    // ) {
+    //   toast.error("من فضلك ادخال بيانات الحقل");
+    //   return;
+    // }
 
     if (
-      overtimeSettings.overtimeRatePerHour <= 0 ||
-      overtimeSettings.deductionRatePerHour <= 0
+      overtimeSettings.overtimeHoursMultiplier < 0 ||
+      overtimeSettings.deductionHoursMultiplier < 0 ||
+      overtimeSettings.workingHoursPerDay <= 0
     ) {
       toast.error("من فضلك ادخال بيانات صحيحة");
       return;
@@ -118,12 +116,14 @@ export default function SettingsPage() {
   };
 
   const confirmSaveOvertime = () => {
+    console.log("PAYLOAD 👉", overtimeSettings);
     saveOvertime(overtimeSettings, {
       onSuccess: () => {
-        toast.success("تم الحفظ بنجاح"); // Validation Rule #1
+        toast.success("تم الحفظ بنجاح");
         setShowOvertimeConfirm(false);
       },
       onError: (error: any) => {
+        console.log("ERROR 👉", error?.response?.data);
         toast.error(error?.response?.data?.message || "فشل في حفظ الإعدادات");
         setShowOvertimeConfirm(false);
       },
@@ -146,7 +146,7 @@ export default function SettingsPage() {
   const confirmSaveWeekend = () => {
     saveWeekend(weekendSettings, {
       onSuccess: () => {
-        toast.success("تم الحفظ بنجاح"); // Validation Rule #1
+        toast.success("تم الحفظ بنجاح");
         setShowWeekendConfirm(false);
       },
       onError: (error: any) => {
@@ -215,11 +215,13 @@ export default function SettingsPage() {
                     type="number"
                     step="0.01"
                     min="0"
-                    value={overtimeSettings.overtimeRatePerHour}
+                    required
+                    value={overtimeSettings.overtimeHoursMultiplier}
                     onChange={(e) =>
                       setOvertimeSettings({
                         ...overtimeSettings,
-                        overtimeRatePerHour: parseFloat(e.target.value) || 0,
+                        overtimeHoursMultiplier:
+                          parseFloat(e.target.value) || 0,
                       })
                     }
                     placeholder="مثال: 50.00"
@@ -239,11 +241,13 @@ export default function SettingsPage() {
                     type="number"
                     step="0.01"
                     min="0"
-                    value={overtimeSettings.deductionRatePerHour}
+                    required
+                    value={overtimeSettings.deductionHoursMultiplier}
                     onChange={(e) =>
                       setOvertimeSettings({
                         ...overtimeSettings,
-                        deductionRatePerHour: parseFloat(e.target.value) || 0,
+                        deductionHoursMultiplier:
+                          parseFloat(e.target.value) || 0,
                       })
                     }
                     placeholder="مثال: 30.00"
@@ -251,6 +255,32 @@ export default function SettingsPage() {
                   />
                   <p className="text-sm text-muted-foreground text-right">
                     المبلغ الذي يخصم من الموظف عن كل ساعة تأخير
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="workingHoursPerDay"
+                    className="text-right block"
+                  >
+                    عدد ساعات العمل في اليوم
+                  </Label>
+                  <Input
+                    id="workingHoursPerDay"
+                    type="number"
+                    min="1"
+                    required
+                    value={overtimeSettings.workingHoursPerDay}
+                    onChange={(e) =>
+                      setOvertimeSettings({
+                        ...overtimeSettings,
+                        workingHoursPerDay: Number(e.target.value) || 0,
+                      })
+                    }
+                    placeholder="مثال: 8"
+                    className="text-right"
+                  />
+                  <p className="text-sm text-muted-foreground text-right">
+                    عدد ساعات العمل الرسمية في اليوم
                   </p>
                 </div>
               </div>

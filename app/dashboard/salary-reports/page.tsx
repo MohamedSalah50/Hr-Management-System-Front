@@ -52,7 +52,7 @@ import {
   MONTHS_AR,
   formatCurrency,
 } from "@/lib/types";
-import { Plus, Search, Trash2, FileText, Users, Printer } from "lucide-react";
+import { Plus, Search, Trash2, FileText, Users, Printer, X } from "lucide-react";
 
 import { useState } from "react";
 import { toast } from "sonner";

@@ -7,6 +7,9 @@ import {
   useDeleteOfficialHoliday,
 } from "@/lib/hooks/useOfficialHoliday";
 import { ICreateOfficialHoliday } from "@/lib/types/api.types";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 export default function OfficialHolidaysPage() {
   const currentYear = new Date().getFullYear();
@@ -37,7 +40,8 @@ export default function OfficialHolidaysPage() {
   };
 
   const handleSubmit = () => {
-    if (!form.name || !form.date || !form.year) return;
+    if (!form.name || !form.date || !form.year)
+      return toast.error("من فضلك ادخل جميع الحقول");
 
     createHoliday(form, {
       onSuccess: () => {
@@ -47,6 +51,7 @@ export default function OfficialHolidaysPage() {
           year,
         });
       },
+      onError: (error: any) => toast.error(error?.response?.data?.message  || "Failed to create holiday"),
     });
   };
 
@@ -150,12 +155,22 @@ export default function OfficialHolidaysPage() {
                   })}
                 </td>
                 <td className="border p-2 text-center">
-                  <button
-                    onClick={() => handleDelete(holiday._id)}
-                    className="px-3 py-1 border rounded hover:bg-red-100"
-                  >
-                    حذف
-                  </button>
+                  <div className="flex justify-center gap-2">
+                    {/* <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEdit(user)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button> */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(holiday._id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-600" />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
