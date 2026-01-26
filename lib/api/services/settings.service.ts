@@ -60,7 +60,11 @@ export const settingsService = {
   saveOvertimeDeduction: async (data: IOvertimeDeductionSettings) => {
     const response = await apiClient.put<IResponse<IOvertimeDeductionSettings>>(
       "/settings/overtime-deduction",
-      data,
+      {
+        overtimeHoursMultiplier: Number(data.overtimeHoursMultiplier),
+        deductionHoursMultiplier: Number(data.deductionHoursMultiplier),
+        workingHoursPerDay: Number(data.workingHoursPerDay),
+      },
     );
     return response.data;
   },

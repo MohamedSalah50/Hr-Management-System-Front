@@ -1,7 +1,6 @@
-// app/dashboard/user-groups/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -31,19 +30,17 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Users, Plus, Pencil, Trash2, UserPlus, Shield } from "lucide-react";
+import { Users, Plus, Pencil, Trash2 } from "lucide-react";
 import {
   useUserGroups,
   useCreateUserGroup,
   useUpdateUserGroup,
   useDeleteUserGroup,
 } from "@/lib/hooks/useUserGroup";
-import { useUsers } from "@/lib/hooks/useUser";
 import { usePermissions } from "@/lib/hooks/useSettings";
 import {
   IUserGroup,
   ICreateUserGroup,
-  IUser,
   IPermission,
 } from "@/lib/types/api.types";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -60,14 +57,12 @@ export default function UserGroupsPage() {
   });
 
   const { data: groupsData, isLoading: isLoadingGroups } = useUserGroups();
-  const { data: usersData } = useUsers();
   const { data: permissionsData } = usePermissions();
   const { mutate: createGroup, isPending: isCreating } = useCreateUserGroup();
   const { mutate: updateGroup, isPending: isUpdating } = useUpdateUserGroup();
   const { mutate: deleteGroup, isPending: isDeleting } = useDeleteUserGroup();
 
   const groups = groupsData?.data?.data || [];
-  const users = usersData?.data?.data || [];
   const permissions = permissionsData?.data?.data || [];
 
   const handleCreate = () => {
@@ -77,7 +72,7 @@ export default function UserGroupsPage() {
     }
 
     if (formData.permissions.length === 0) {
-      toast.error("من فضلك قم بتحديد  صلاحيات المجموعه قبل الاضافه");
+      toast.error("من فضلك قم بتحديد صلاحيات المجموعه قبل الاضافه");
       return;
     }
 
@@ -98,6 +93,11 @@ export default function UserGroupsPage() {
 
     if (!formData.name.trim()) {
       toast.error("اسم المجموعة مطلوب");
+      return;
+    }
+
+    if (formData.permissions.length === 0) {
+      toast.error("من فضلك قم بتحديد صلاحيات المجموعه");
       return;
     }
 
@@ -159,17 +159,8 @@ export default function UserGroupsPage() {
     }));
   };
 
-  const toggleUser = (userId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      userIds: prev.userIds?.includes(userId)
-        ? prev.userIds.filter((id) => id !== userId)
-        : [...(prev.userIds || []), userId],
-    }));
-  };
-
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto py-6 space-y-6" dir="rtl">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -185,20 +176,21 @@ export default function UserGroupsPage() {
               إضافة مجموعة جديدة
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent
+            className="max-w-4xl max-h-[90vh] overflow-y-auto"
+            dir="rtl"
+          >
             <DialogHeader>
               <DialogTitle>إضافة مجموعة مستخدمين جديدة</DialogTitle>
               <DialogDescription>
-                قم بإدخال بيانات المجموعة وتحديد الصلاحيات والمستخدمين
+                قم بإدخال بيانات المجموعة وتحديد الصلاحيات
               </DialogDescription>
             </DialogHeader>
             <GroupForm
               formData={formData}
               setFormData={setFormData}
               permissions={permissions}
-              users={users}
               togglePermission={togglePermission}
-              toggleUser={toggleUser}
               onSubmit={handleCreate}
               isLoading={isCreating}
               submitLabel="إضافة المجموعة"
@@ -229,7 +221,7 @@ export default function UserGroupsPage() {
                   <TableRow>
                     <TableHead className="text-right">اسم المجموعة</TableHead>
                     <TableHead className="text-right">الوصف</TableHead>
-                    <TableHead className="text-right">عدد المستخدمين</TableHead>
+                    {/* <TableHead className="text-right">عدد المستخدمين</TableHead> */}
                     <TableHead className="text-right">عدد الصلاحيات</TableHead>
                     <TableHead className="text-right">الإجراءات</TableHead>
                   </TableRow>
@@ -244,11 +236,11 @@ export default function UserGroupsPage() {
                         </div>
                       </TableCell>
                       <TableCell>{group.description || "-"}</TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <Badge variant="secondary">
                           {group.userIds?.length || 0} مستخدم
                         </Badge>
-                      </TableCell>
+                      </TableCell>*/}
                       <TableCell>
                         <Badge variant="outline">
                           {group.permissions?.length || 0} صلاحية
@@ -284,20 +276,21 @@ export default function UserGroupsPage() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          className="max-w-4xl max-h-[90vh] overflow-y-auto"
+          dir="rtl"
+        >
           <DialogHeader>
             <DialogTitle>تعديل مجموعة المستخدمين</DialogTitle>
             <DialogDescription>
-              قم بتحديث بيانات المجموعة والصلاحيات والمستخدمين
+              قم بتحديث بيانات المجموعة والصلاحيات
             </DialogDescription>
           </DialogHeader>
           <GroupForm
             formData={formData}
             setFormData={setFormData}
             permissions={permissions}
-            users={users}
             togglePermission={togglePermission}
-            toggleUser={toggleUser}
             onSubmit={handleUpdate}
             isLoading={isUpdating}
             submitLabel="حفظ التغييرات"
@@ -313,13 +306,58 @@ function GroupForm({
   formData,
   setFormData,
   permissions,
-  users,
   togglePermission,
-  toggleUser,
   onSubmit,
   isLoading,
   submitLabel,
 }: any) {
+  // Group permissions by resource
+  const groupedPermissions = useMemo(() => {
+    const grouped: Record<
+      string,
+      Record<string, { id: string; name: string }>
+    > = {};
+
+    permissions.forEach((permission: IPermission) => {
+      if (!grouped[permission.resource]) {
+        grouped[permission.resource] = {};
+      }
+      grouped[permission.resource][permission.action] = {
+        id: permission._id,
+        name: permission.name,
+      };
+    });
+
+    return grouped;
+  }, [permissions]);
+
+  const resources = Object.keys(groupedPermissions);
+  const actions = ["create", "read", "update", "delete"];
+
+  const actionLabels: Record<string, string> = {
+    create: "إضافة",
+    read: "عرض",
+    update: "تعديل",
+    delete: "حذف",
+  };
+
+  const resourceLabels: Record<string, string> = {
+    employees: "الموظفين",
+    departments: "الأقسام",
+    attendance: "الحضور والانصراف",
+    "salary-reports": "تقارير الرواتب",
+    settings: "الإعدادات",
+    users: "المستخدمين",
+    "user-groups": "مجموعات المستخدمين",
+    permissions: "الصلاحيات",
+    "official-holidays": "الإجازات الرسمية",
+  };
+
+  const isPermissionChecked = (permissionId: string | undefined) => {
+    if (!permissionId) return false;
+    return formData.permissions.includes(permissionId);
+  };
+
   return (
     <div className="space-y-4">
       {/* Basic Info */}
@@ -330,6 +368,7 @@ function GroupForm({
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           placeholder="أدخل اسم المجموعة"
+          disabled={isLoading}
         />
       </div>
 
@@ -343,79 +382,74 @@ function GroupForm({
           }
           placeholder="أدخل وصف المجموعة (اختياري)"
           rows={3}
+          disabled={isLoading}
         />
       </div>
 
-      {/* Permissions Section */}
+      {/* Permissions Table */}
       <div className="space-y-2">
-        <Label className="flex items-center gap-2">
-          <Shield className="h-4 w-4" />
-          الصلاحيات *
-        </Label>
-        <div className="border rounded-md p-4 max-h-48 overflow-y-auto">
-          {permissions.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              لا توجد صلاحيات متاحة
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {permissions.map((permission: IPermission) => (
-                <div key={permission._id} className="flex items-center gap-2">
-                  <Checkbox
-                    id={`permission-${permission._id}`}
-                    checked={formData.permissions.includes(permission._id)}
-                    onCheckedChange={() => togglePermission(permission._id)}
-                  />
-                  <Label
-                    htmlFor={`permission-${permission._id}`}
-                    className="cursor-pointer flex-1"
-                  >
-                    {permission.name}
-                    <span className="text-xs text-muted-foreground mr-2">
-                      ({permission.resource} - {permission.action})
-                    </span>
-                  </Label>
-                </div>
-              ))}
-            </div>
-          )}
+        <Label>الصلاحيات *</Label>
+        <div className="border rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="text-right font-bold w-[200px]">
+                    الصفحة
+                  </TableHead>
+                  {actions.map((action) => (
+                    <TableHead key={action} className="text-center font-bold">
+                      {actionLabels[action]}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {resources.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={actions.length + 1}
+                      className="text-center text-muted-foreground py-8"
+                    >
+                      لا توجد صلاحيات متاحة
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  resources.map((resource) => (
+                    <TableRow key={resource} className="hover:bg-gray-50">
+                      <TableCell className="font-medium">
+                        {resourceLabels[resource] || resource}
+                      </TableCell>
+                      {actions.map((action) => {
+                        const permission = groupedPermissions[resource][action];
+                        return (
+                          <TableCell key={action} className="text-center">
+                            {permission ? (
+                              <div className="flex justify-center">
+                                <Checkbox
+                                  checked={isPermissionChecked(permission.id)}
+                                  onCheckedChange={() =>
+                                    togglePermission(permission.id)
+                                  }
+                                  disabled={isLoading}
+                                />
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-      </div>
-
-      {/* Users Section */}
-      <div className="space-y-2">
-        <Label className="flex items-center gap-2">
-          <UserPlus className="h-4 w-4" />
-          المستخدمين
-        </Label>
-        <div className="border rounded-md p-4 max-h-48 overflow-y-auto">
-          {users.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              لا يوجد مستخدمين متاحين
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {users.map((user: IUser) => (
-                <div key={user._id} className="flex items-center gap-2">
-                  <Checkbox
-                    id={`user-${user._id}`}
-                    checked={formData.userIds?.includes(user._id)}
-                    onCheckedChange={() => toggleUser(user._id)}
-                  />
-                  <Label
-                    htmlFor={`user-${user._id}`}
-                    className="cursor-pointer flex-1"
-                  >
-                    {user.fullName}
-                    <span className="text-xs text-muted-foreground mr-2">
-                      ({user.email})
-                    </span>
-                  </Label>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <p className="text-xs text-muted-foreground">
+          اختر الصلاحيات المطلوبة لهذه المجموعة
+        </p>
       </div>
 
       <Button onClick={onSubmit} disabled={isLoading} className="w-full">

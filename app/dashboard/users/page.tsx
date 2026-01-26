@@ -382,7 +382,6 @@ export default function UsersPage() {
                 </TableHeader>
                 <TableBody>
                   {users.map((user) => {
-                    // ✅ استخراج اسم المجموعة بشكل آمن
                     let groupName = "غير محدد";
                     if (user.userGroupId) {
                       if (typeof user.userGroupId === "object") {

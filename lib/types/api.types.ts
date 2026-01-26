@@ -418,8 +418,9 @@ export interface ICreateSetting {
 }
 
 export interface IOvertimeDeductionSettings {
-  overtimeRatePerHour: number;
-  deductionRatePerHour: number;
+ overtimeHoursMultiplier: number; 
+  deductionHoursMultiplier: number; 
+  workingHoursPerDay: number;
 }
 
 export interface IWeekendSettings {

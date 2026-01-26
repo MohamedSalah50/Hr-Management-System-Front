@@ -12,7 +12,6 @@ import {
 } from "@/lib/types/api.types";
 
 export const attendanceService = {
-  // ✅ FIX: Create attendance - Backend returns { message, data: [attendance] }
   create: async (data: ICreateAttendance) => {
     const response = await apiClient.post<{
       message: string;
@@ -74,7 +73,6 @@ export const attendanceService = {
     } as IResponse<IAttendance>;
   },
 
-  // ✅ FIX: Update attendance - Backend returns { message, data }
   update: async (id: string, data: IUpdateAttendance) => {
     const response = await apiClient.patch<{
       message: string;
@@ -125,7 +123,7 @@ export const attendanceService = {
 
   // Export to Excel
   exportExcel: async (searchData: ISearchAttendance) => {
-    await apiClient.downloadFile(
+    return await apiClient.downloadFile(
       "/attendance/export",
       `attendance-${Date.now()}.xlsx`,
       searchData,

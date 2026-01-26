@@ -58,7 +58,6 @@ export const useAttendanceStatistics = (
   });
 };
 
-// ✅ FIX: Create attendance with proper invalidation
 export const useCreateAttendance = () => {
   const queryClient = useQueryClient();
 
@@ -71,7 +70,6 @@ export const useCreateAttendance = () => {
   });
 };
 
-// ✅ FIX: Update attendance with proper invalidation
 export const useUpdateAttendance = () => {
   const queryClient = useQueryClient();
 
@@ -112,7 +110,6 @@ export const useImportAttendance = () => {
   });
 };
 
-// Export to Excel
 export const useExportAttendance = () => {
   return useMutation({
     mutationFn: (searchData: ISearchAttendance) =>

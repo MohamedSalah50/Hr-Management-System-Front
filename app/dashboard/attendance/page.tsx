@@ -147,15 +147,15 @@ export default function AttendancePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.employeeId) {
+      toast.error("من فضلك اختر موظف");
+      return;
+    }
+
     if (formData.status === AttendanceEnum.PRESENT && !formData.checkIn) {
       toast.error("وقت الحضور مطلوب للموظف الحاضر");
       return;
     }
-
-    // if (formData.year && formData.year < 2008) {
-    //   toast.error("من فضلك اختر سنة صحيحه");
-    //   return;
-    // }
 
     if (editingAttendance) {
       updateAttendance(
@@ -261,28 +261,30 @@ export default function AttendancePage() {
     refetch();
   };
 
-  const handleExport = () => {
-    const filters = isSearchActive ? searchFilters : {};
-    exportAttendance(filters, {
-      onSuccess: () => {
-        toast.success("تم تصدير البيانات بنجاح");
-      },
-      onError: () => {
-        toast.error("فشل في تصدير البيانات");
-      },
-    });
-  };
+  const handleExport = async () => {
+    try {
+      const filters = isSearchActive ? searchPayload : {};
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-96" dir="rtl">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري التحميل...</p>
-        </div>
-      </div>
-    );
-  }
+      console.log("🚀 Exporting with filters:", filters);
+
+      // استدعي الـ mutate بشكل مباشر
+      exportAttendance(filters, {
+        onSuccess: () => {
+          console.log("✅ Export success");
+          toast.success("تم تصدير البيانات بنجاح");
+        },
+        onError: (error: any) => {
+          console.error("❌ Export error:", error);
+          toast.error(
+            error?.response?.data?.message || "فشل في تصدير البيانات",
+          );
+        },
+      });
+    } catch (error) {
+      console.error("💥 Catch error:", error);
+      toast.error("حدث خطأ أثناء التصدير");
+    }
+  };
 
   // Use search results if active, otherwise use all records
   const displayData = isSearchActive ? searchData : attendanceData;
