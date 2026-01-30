@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -37,7 +37,7 @@ import {
   useUpdateUserGroup,
   useDeleteUserGroup,
 } from "@/lib/hooks/useUserGroup";
-import { usePermissions } from "@/lib/hooks/useSettings";
+import { usePermissions } from "@/lib/hooks/usePermission";
 import {
   IUserGroup,
   ICreateUserGroup,
@@ -49,6 +49,7 @@ export default function UserGroupsPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<IUserGroup | null>(null);
+  const [editingUserGroup, setEditingUserGroup] = useState<IUserGroup | null>(null);
   const [formData, setFormData] = useState<ICreateUserGroup>({
     name: "",
     description: "",
@@ -65,7 +66,9 @@ export default function UserGroupsPage() {
   const groups = groupsData?.data?.data || [];
   const permissions = permissionsData?.data?.data || [];
 
-  const handleCreate = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+
+    e.preventDefault();
     if (!formData.name.trim()) {
       toast.error("من فضلك ادخل اسم المجموعه");
       return;
@@ -76,44 +79,33 @@ export default function UserGroupsPage() {
       return;
     }
 
-    createGroup(formData, {
-      onSuccess: () => {
-        toast.success("تم إضافة المجموعة بنجاح");
-        setIsCreateDialogOpen(false);
-        resetForm();
-      },
-      onError: (error: any) => {
-        toast.error(error?.response?.data?.message || "حدث خطأ");
-      },
-    });
-  };
-
-  const handleUpdate = () => {
-    if (!selectedGroup) return;
-
-    if (!formData.name.trim()) {
-      toast.error("اسم المجموعة مطلوب");
-      return;
-    }
-
-    if (formData.permissions.length === 0) {
-      toast.error("من فضلك قم بتحديد صلاحيات المجموعه");
-      return;
-    }
-
-    updateGroup(
-      { id: selectedGroup._id, data: formData },
-      {
+    if (editingUserGroup) {
+      updateGroup(
+        { id: selectedGroup?._id, data: { ...formData } },
+        {
+          onSuccess: () => {
+            toast.success("تم تحديث المجموعة بنجاح");
+            setIsEditDialogOpen(false);
+            resetForm();
+          },
+          onError: (error: any) => {
+            toast.error(error?.response?.data?.message || "حدث خطأ");
+          },
+        },
+      );
+    } else {
+      createGroup(formData, {
         onSuccess: () => {
-          toast.success("تم تحديث المجموعة بنجاح");
-          setIsEditDialogOpen(false);
+          toast.success("تم إضافة المجموعة بنجاح");
+          setIsCreateDialogOpen(false);
           resetForm();
         },
         onError: (error: any) => {
           toast.error(error?.response?.data?.message || "حدث خطأ");
         },
-      },
-    );
+      });
+    }
+
   };
 
   const handleDelete = (id: string) => {
@@ -191,7 +183,7 @@ export default function UserGroupsPage() {
               setFormData={setFormData}
               permissions={permissions}
               togglePermission={togglePermission}
-              onSubmit={handleCreate}
+              onSubmit={handleSubmit}
               isLoading={isCreating}
               submitLabel="إضافة المجموعة"
             />
@@ -458,3 +450,35 @@ function GroupForm({
     </div>
   );
 }
+
+
+
+
+
+// const handleUpdate = () => {
+//   if (!selectedGroup) return;
+
+//   if (!formData.name.trim()) {
+//     toast.error("اسم المجموعة مطلوب");
+//     return;
+//   }
+
+//   if (formData.permissions.length === 0) {
+//     toast.error("من فضلك قم بتحديد صلاحيات المجموعه");
+//     return;
+//   }
+
+//   updateGroup(
+//     { id: selectedGroup._id, data: { ...formData } },
+//     {
+//       onSuccess: () => {
+//         toast.success("تم تحديث المجموعة بنجاح");
+//         setIsEditDialogOpen(false);
+//         resetForm();
+//       },
+//       onError: (error: any) => {
+//         toast.error(error?.response?.data?.message || "حدث خطأ");
+//       },
+//     },
+//   );
+// };

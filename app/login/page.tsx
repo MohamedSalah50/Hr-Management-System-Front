@@ -35,9 +35,7 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // =====================
-    // Client-side validation (toast only)
-    // =====================
+
     if (!formData.usernameOrEmail.trim()) {
       toast.error("من فضلك أدخل اسم المستخدم أو البريد الإلكتروني");
       return;
@@ -48,9 +46,7 @@ export default function LoginPage() {
       return;
     }
 
-    // =====================
-    // API Call
-    // =====================
+
     login(formData, {
       onSuccess: () => {
         toast.success("تم تسجيل الدخول بنجاح");
@@ -60,8 +56,8 @@ export default function LoginPage() {
         const apiError = error as ApiError;
         toast.error(
           apiError.response?.data?.message ||
-            apiError.message ||
-            "بيانات الدخول غير صحيحة",
+          apiError.message ||
+          "بيانات الدخول غير صحيحة",
         );
       },
     });

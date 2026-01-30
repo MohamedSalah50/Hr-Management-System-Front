@@ -15,6 +15,7 @@ import {
   UserCog,
   LogOut,
   Calendar1,
+  PercentDiamondIcon,
 } from "lucide-react";
 import { useLogout } from "@/lib/hooks/useAuth";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ import { useState, useEffect } from "react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "permissions", href: "/dashboard/permissions", icon: PercentDiamondIcon },
   { name: "Employees", href: "/dashboard/employees", icon: Users },
   { name: "Departments", href: "/dashboard/departments", icon: Building2 },
   { name: "Attendance", href: "/dashboard/attendance", icon: Calendar },

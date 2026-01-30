@@ -60,8 +60,8 @@ export const officialHolidayService = {
 
   // Delete official holiday - Backend returns { message }
   delete: async (id: string) => {
-    const response = await apiClient.delete<IResponse>(
-      `/official-holidays/${id}`,
+    const response = await apiClient.patch<IResponse>(
+      `/official-holidays/${id}/soft-delete`,
     );
     return response.data;
   },

@@ -157,7 +157,7 @@ export default function DepartmentsPage() {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder="e.g., Human Resources"
-                  // required
+                // required
                 />
               </div>
               <div className="space-y-2">

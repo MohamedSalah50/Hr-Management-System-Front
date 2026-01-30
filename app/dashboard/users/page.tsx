@@ -93,7 +93,6 @@ export default function UsersPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation Rules
     if (!formData.fullName.trim()) {
       toast.error("من فضلك ادخل الاسم بالكامل");
       return;

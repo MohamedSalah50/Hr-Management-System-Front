@@ -138,7 +138,7 @@ export default function EmployeesPage() {
     const birth = new Date(formData.birthDate);
     const minBirth = new Date("2005-06-06");
     if (birth > minBirth) {
-      toast.error("تاريخ الميلاد يجب أن يكون قبل 6/6/2005");
+      toast.error(`تاريخ الميلاد يجب ان يكون قبل ${minBirth}`);
       return;
     }
 
@@ -219,7 +219,7 @@ export default function EmployeesPage() {
       departmentId:
         typeof employee.departmentId === "string"
           ? employee.departmentId
-          : employee.departmentId._id,
+          : employee.departmentId?._id,
     });
     setIsDialogOpen(true);
   };
@@ -286,7 +286,7 @@ export default function EmployeesPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, fullName: e.target.value })
                     }
-                    // required
+                  // required
                   />
                 </div>
                 <div className="space-y-2">
@@ -301,7 +301,7 @@ export default function EmployeesPage() {
                         contractDate: e.target.value,
                       })
                     }
-                    // required
+                  // required
                   />
                 </div>
 
@@ -313,7 +313,7 @@ export default function EmployeesPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, address: e.target.value })
                     }
-                    // required
+                  // required
                   />
                 </div>
 
@@ -329,7 +329,7 @@ export default function EmployeesPage() {
                         baseSalary: parseFloat(e.target.value),
                       })
                     }
-                    // required
+                  // required
                   />
                 </div>
 
@@ -341,7 +341,7 @@ export default function EmployeesPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
                     }
-                    // required
+                  // required
                   />
                 </div>
 
@@ -354,7 +354,7 @@ export default function EmployeesPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, checkInTime: e.target.value })
                     }
-                    // required
+                  // required
                   />
                 </div>
 
@@ -385,7 +385,7 @@ export default function EmployeesPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, checkOutTime: e.target.value })
                     }
-                    // required
+                  // required
                   />
                 </div>
 
@@ -397,7 +397,7 @@ export default function EmployeesPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, nationality: e.target.value })
                     }
-                    // required
+                  // required
                   />
                 </div>
 
@@ -410,7 +410,7 @@ export default function EmployeesPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, birthDate: e.target.value })
                     }
-                    // required
+                  // required
                   />
                 </div>
 
@@ -422,7 +422,7 @@ export default function EmployeesPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, nationalId: e.target.value })
                     }
-                    // required
+                  // required
                   />
                 </div>
 
@@ -491,7 +491,7 @@ export default function EmployeesPage() {
                 <TableCell>
                   {typeof employee.departmentId === "string"
                     ? employee.departmentId
-                    : employee.departmentId.name}
+                    : employee.departmentId?.name}
                 </TableCell>
                 <TableCell>${employee.baseSalary.toLocaleString()}</TableCell>
                 <TableCell>

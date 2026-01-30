@@ -7,6 +7,7 @@ export * from "./employee.service";
 export * from "./attendance.service";
 export * from "./salary-report.service";
 export * from "./settings.service";
-export * from "./role-permission.service";
+export * from "./role.service";
 export * from "./official-holiday.service";
 export * from "./userGroup.service";
+export * from "./permission.service";

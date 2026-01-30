@@ -8,3 +8,4 @@ export * from "./useAttendance";
 export * from "./useSalaryReport";
 export * from "./useSettings";
 export * from "./useUserGroup";
+export * from "./usePermission";

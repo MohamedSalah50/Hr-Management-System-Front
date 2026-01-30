@@ -52,7 +52,7 @@ export const settingsService = {
 
   // Delete setting - Backend returns { message }
   delete: async (key: string) => {
-    const response = await apiClient.delete<IResponse>(`/settings/${key}`);
+    const response = await apiClient.patch<IResponse>(`/settings/${key}/soft-delete`);
     return response.data;
   },
 
