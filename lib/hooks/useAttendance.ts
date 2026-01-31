@@ -86,7 +86,6 @@ export const useUpdateAttendance = () => {
   });
 };
 
-// Delete attendance
 export const useDeleteAttendance = () => {
   const queryClient = useQueryClient();
 
@@ -98,7 +97,6 @@ export const useDeleteAttendance = () => {
   });
 };
 
-// Import from Excel
 export const useImportAttendance = () => {
   const queryClient = useQueryClient();
 

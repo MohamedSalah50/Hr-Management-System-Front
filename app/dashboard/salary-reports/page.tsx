@@ -52,7 +52,15 @@ import {
   MONTHS_AR,
   formatCurrency,
 } from "@/lib/types";
-import { Plus, Search, Trash2, FileText, Users, Printer, X } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Trash2,
+  FileText,
+  Users,
+  Printer,
+  X,
+} from "lucide-react";
 
 import { useState } from "react";
 import { toast } from "sonner";
@@ -125,7 +133,6 @@ export default function SalaryReportPage() {
     searchFilters.month || currentMonth,
     searchFilters.year || currentYear,
   );
-
 
   const resetForm = () => {
     setFormData({

@@ -42,6 +42,7 @@ import {
   useDeleteAttendance,
   useUpdateAttendance,
   useExportAttendance,
+  useImportAttendance,
   useSearchAttendance,
 } from "@/lib/hooks/useAttendance";
 import { useEmployees } from "@/lib/hooks/useEmployee";
@@ -62,7 +63,7 @@ import {
   FileSpreadsheet,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 const buildAttendanceSearchPayload = (
@@ -90,7 +91,7 @@ const buildAttendanceSearchPayload = (
 };
 
 export default function AttendancePage() {
-  const { data: attendanceData, isLoading, refetch } = useAttendanceRecords();
+  const { data: attendanceData, refetch } = useAttendanceRecords();
   const { data: employeesData } = useEmployees();
   const { data: departmentsData } = useDepartments();
   const { mutate: createAttendance, isPending: isCreating } =
@@ -99,6 +100,8 @@ export default function AttendancePage() {
     useUpdateAttendance();
   const { mutate: deleteAttendance } = useDeleteAttendance();
   const { mutate: exportAttendance } = useExportAttendance();
+  const { mutate: importAttendance, isPending: isImporting } =
+    useImportAttendance();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAttendance, setEditingAttendance] =
@@ -267,7 +270,6 @@ export default function AttendancePage() {
 
       console.log("🚀 Exporting with filters:", filters);
 
-      // استدعي الـ mutate بشكل مباشر
       exportAttendance(filters, {
         onSuccess: () => {
           console.log("✅ Export success");
@@ -286,11 +288,47 @@ export default function AttendancePage() {
     }
   };
 
+  const handleImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+      toast.error("من فضلك اختر ملف Excel صحيح");
+      return;
+    }
+
+    importAttendance(file, {
+      onSuccess: (res) => {
+        toast.success(res.message || "تم استيراد الملف بنجاح");
+
+        if (res.data?.errors) {
+          toast.info(
+            `تم استيراد ${res.data.imported} سجل - أخطاء: ${res.data.errors}`,
+          );
+          console.table(res.data.errorDetails);
+        }
+
+        refetch();
+      },
+      onError: (error: any) => {
+        toast.error(error?.response?.data?.message || "فشل في استيراد الملف");
+      },
+    });
+
+    e.target.value = "";
+  };
+
   // Use search results if active, otherwise use all records
   const displayData = isSearchActive ? searchData : attendanceData;
   const attendances = displayData?.data?.data || [];
   const employees = employeesData?.data?.data || [];
   const departments = departmentsData?.data?.data || [];
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -451,13 +489,21 @@ export default function AttendancePage() {
           </DialogContent>
         </Dialog>
 
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.xls"
+          hidden
+          onChange={handleFileChange}
+        />
+
         <Button
-          onClick={handleExport}
+          onClick={handleImport}
           variant="outline"
           className="bg-green-50 hover:bg-green-100 border-green-300"
         >
           <FileSpreadsheet className="ml-2 h-4 w-4 text-green-600" />
-          Excel
+          Excel (استيراد)
         </Button>
 
         <Button

@@ -1,4 +1,3 @@
-// lib/api/services/attendance.service.ts
 
 import { apiClient } from "../client";
 import {
@@ -15,18 +14,16 @@ export const attendanceService = {
   create: async (data: ICreateAttendance) => {
     const response = await apiClient.post<{
       message: string;
-      data: IAttendance[]; // Backend returns ARRAY
+      data: IAttendance[];
     }>("/attendance", data);
 
-    // Transform to single object for consistency
     return {
-      data: response.data.data[0], // Get first item from array
+      data: response.data.data[0],
       message: response.data.message,
       status: 200,
     } as IResponse<IAttendance>;
   },
 
-  // Get all attendance records - Backend returns { data, total }
   getAll: async () => {
     const response = await apiClient.get<{
       data: IAttendance[];
@@ -44,7 +41,6 @@ export const attendanceService = {
     } as IResponse<IPaginatedResponse<IAttendance>>;
   },
 
-  // Search attendance records - Backend returns { data, total }
   search: async (searchData: ISearchAttendance) => {
     const response = await apiClient.post<{
       data: IAttendance[];
@@ -61,7 +57,6 @@ export const attendanceService = {
     } as IResponse<IPaginatedResponse<IAttendance>>;
   },
 
-  // Get attendance by ID - Backend returns { data }
   getById: async (id: string) => {
     const response = await apiClient.get<{ data: IAttendance }>(
       `/attendance/${id}`,
@@ -86,10 +81,9 @@ export const attendanceService = {
     } as IResponse<IAttendance>;
   },
 
-  // Delete attendance record - Backend returns { message }
   delete: async (id: string) => {
-    const response = await apiClient.delete<{ message: string }>(
-      `/attendance/${id}`,
+    const response = await apiClient.patch<{ message: string }>(
+      `/attendance/${id}/soft-delete`,
     );
     return {
       message: response.data.message,
@@ -97,7 +91,6 @@ export const attendanceService = {
     } as IResponse;
   },
 
-  // Get statistics for employee - Backend returns { data }
   getStatistics: async (employeeId: string, month: number, year: number) => {
     const response = await apiClient.get<{ data: IAttendanceStatistics }>(
       `/attendance/statistics/${employeeId}?month=${month}&year=${year}`,
@@ -109,7 +102,6 @@ export const attendanceService = {
     } as IResponse<IAttendanceStatistics>;
   },
 
-  // Import from Excel
   importExcel: async (file: File) => {
     const response = await apiClient.uploadFile<
       IResponse<{
@@ -121,7 +113,6 @@ export const attendanceService = {
     return response.data;
   },
 
-  // Export to Excel
   exportExcel: async (searchData: ISearchAttendance) => {
     return await apiClient.downloadFile(
       "/attendance/export",

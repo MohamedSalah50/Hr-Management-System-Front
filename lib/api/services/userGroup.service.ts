@@ -59,7 +59,7 @@ export const userGroupService = {
 
   // Delete user group - Backend returns { message }
   delete: async (id: string) => {
-    const response = await apiClient.delete<IResponse>(`/user-groups/${id}`);
+    const response = await apiClient.patch<IResponse>(`/user-groups/${id}/soft-delete`);
     return response.data;
   },
 
@@ -67,7 +67,7 @@ export const userGroupService = {
   addUsers: async (groupId: string, userIds: string[]) => {
     const response = await apiClient.post<IResponse<IUserGroup>>(
       `/user-groups/${groupId}/users`,
-      { userIds }, // ✅ الباك اند يتوقع userIds
+      { userIds }, 
     );
     return response.data;
   },

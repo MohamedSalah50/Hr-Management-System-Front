@@ -89,7 +89,7 @@ export const userService = {
 
   // Delete user - Backend returns { message }
   delete: async (id: string) => {
-    const response = await apiClient.delete<IResponse>(`/user/${id}`);
+    const response = await apiClient.patch<IResponse>(`/user/${id}/soft-delete`);
     return response.data;
   },
 

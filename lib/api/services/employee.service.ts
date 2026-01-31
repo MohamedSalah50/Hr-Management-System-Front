@@ -93,7 +93,7 @@ export const employeeService = {
 
   // Delete employee - Backend returns { message }
   delete: async (id: string) => {
-    const response = await apiClient.delete<IResponse>(`/employee/${id}`);
+    const response = await apiClient.patch<IResponse>(`/employee/${id}/soft-delete`);
     return response.data;
   },
 

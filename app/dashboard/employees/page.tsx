@@ -216,10 +216,10 @@ export default function EmployeesPage() {
       baseSalary: employee.baseSalary,
       checkInTime: employee.checkInTime,
       checkOutTime: employee.checkOutTime,
-      departmentId:
-        typeof employee.departmentId === "string"
-          ? employee.departmentId
-          : employee.departmentId._id,
+      departmentId: employee.departmentId,
+        // typeof employee.departmentId === "string"
+        //   ? employee.departmentId
+        //   : employee.departmentId._id,
     });
     setIsDialogOpen(true);
   };
@@ -491,7 +491,7 @@ export default function EmployeesPage() {
                 <TableCell>
                   {typeof employee.departmentId === "string"
                     ? employee.departmentId
-                    : employee.departmentId.name}
+                    : employee.departmentId?.name}
                 </TableCell>
                 <TableCell>${employee.baseSalary.toLocaleString()}</TableCell>
                 <TableCell>

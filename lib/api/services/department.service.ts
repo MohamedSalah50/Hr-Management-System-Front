@@ -59,7 +59,9 @@ export const departmentService = {
 
   // Delete department - Backend returns { message }
   delete: async (id: string) => {
-    const response = await apiClient.delete<IResponse>(`/departments/${id}`);
+    const response = await apiClient.patch<IResponse>(
+      `/departments/${id}/soft-delete`,
+    );
     return response.data;
   },
 };
